@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "user".
@@ -16,8 +17,33 @@ use Yii;
  *
  * @property Claim[] $claims
  */
-class User extends \yii\db\ActiveRecord
+class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
+    public static function findIdentity($id)
+    {
+        return static::findOne($id);
+    }
+
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+//        return static::findOne(['access_token' => $token]);
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getAuthKey()
+    {
+//        return $this->authKey;
+    }
+
+    public function validateAuthKey($authKey)
+    {
+//        return $this->authKey === $authKey;
+    }
+    
     /**
      * {@inheritdoc}
      */
@@ -61,5 +87,10 @@ class User extends \yii\db\ActiveRecord
     public function getClaims()
     {
         return $this->hasMany(Claim::className(), ['user_id' => 'id']);
+    }
+
+    public function getShortName(){
+        $exploded = explode(' ', $this->fio);
+        return $exploded[0].' '.mb_substr($exploded[1],0,1,'UTF-8').'. '.mb_substr($exploded[1],0,1,'UTF-8').'.';
     }
 }

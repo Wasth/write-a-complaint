@@ -39,7 +39,7 @@ AppAsset::register($this);
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Городской портал</a>
+                <a class="navbar-brand" href="/">Городской портал</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -53,7 +53,7 @@ AppAsset::register($this);
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                            aria-expanded="false">
-                            <?= 'name' ?>
+                            <?= Yii::$app->user->identity->getShortName() ?>
                             <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="<?= Url::to(['site/myclaims']) ?>">Мои заявки</a></li>

@@ -49,6 +49,7 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'site/claim/<id:\d+>' => 'site/claim'
             ],
         ],
 

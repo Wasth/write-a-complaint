@@ -2,127 +2,102 @@
 
 namespace app\controllers;
 
+use app\models\Claim;
+use app\models\SigninForm;
 use Yii;
 use yii\filters\AccessControl;
+use yii\helpers\Url;
 use yii\web\Controller;
-use yii\web\Response;
-use yii\filters\VerbFilter;
-use app\models\LoginForm;
-use app\models\ContactForm;
 
 class SiteController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
+
     public function behaviors()
     {
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout'],
+                'only' => ['signin', 'signup', 'logout', 'newclaim', 'myclaims'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
                         'allow' => true,
-                        'roles' => ['@'],
+                        'actions' => ['signin', 'signup'],
+                        'roles' => ['?']
                     ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
+                    [
+                        'allow' => true,
+                        'actions' => ['logout', 'newclaim', 'myclaims'],
+                        'roles' => ['@']
+                    ],
+                ]
+            ]
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function actions()
+    public function actionSignin()
     {
-        return [
-            'error' => [
-                'class' => 'yii\web\ErrorAction',
-            ],
-            'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
-            ],
-        ];
-    }
+        $model = new SigninForm();
 
-    /**
-     * Displays homepage.
-     *
-     * @return string
-     */
-    public function actionIndex()
-    {
-        return $this->render('index');
-    }
-
-    /**
-     * Login action.
-     *
-     * @return Response|string
-     */
-    public function actionLogin()
-    {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->validate() && $model->signin()) {
+                return $this->goHome();
+            }
         }
 
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        }
-
-        $model->password = '';
-        return $this->render('login', [
+        return $this->render('signin', [
             'model' => $model,
         ]);
     }
 
-    /**
-     * Logout action.
-     *
-     * @return Response
-     */
+    public function actionSignup()
+    {
+        $model = new \app\models\SignupForm();
+
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->validate() && $model->signup()) {
+                return $this->goHome();
+            }
+        }
+
+        return $this->render('signup', [
+            'model' => $model,
+        ]);
+    }
+
     public function actionLogout()
     {
         Yii::$app->user->logout();
 
-        return $this->goHome();
+        return $this->redirect(Url::home());
     }
 
-    /**
-     * Displays contact page.
-     *
-     * @return Response|string
-     */
-    public function actionContact()
+    public function actionIndex()
     {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
+        $claims = Claim::find()->limit(8)->all();
+        return $this->render('index', [
+            'claims' => $claims
+        ]);
+    }
 
-            return $this->refresh();
+    public function actionNewclaim()
+    {
+        $model = new \app\models\Claim();
+
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->validate() && $model->save(false)) {
+                return $this->redirect(['site/claim', 'id' => $model->id]);
+            }
         }
-        return $this->render('contact', [
+
+        return $this->render('newclaim', [
             'model' => $model,
         ]);
     }
 
-    /**
-     * Displays about page.
-     *
-     * @return string
-     */
-    public function actionAbout()
-    {
-        return $this->render('about');
+    public function actionClaim($id){
+        $claim = Claim::findOne($id);
+        return $this->render('claim',
+            ['claim' => $claim]
+        );
     }
 }

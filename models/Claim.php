@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "claim".
@@ -22,6 +24,8 @@ use Yii;
  */
 class Claim extends \yii\db\ActiveRecord
 {
+    public $image;
+
     /**
      * {@inheritdoc}
      */
@@ -36,6 +40,8 @@ class Claim extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['image'], 'file', 'skipOnEmpty' => true, 'extensions' => 'jpg, jpeg, png, bmp'],
+            [['name', 'description', 'category_id','image'], 'required'],
             [['description'], 'string'],
             [['category_id', 'user_id'], 'integer'],
             [['created_at'], 'safe'],
@@ -63,6 +69,13 @@ class Claim extends \yii\db\ActiveRecord
         ];
     }
 
+    public function fields()
+    {
+        return ArrayHelper::merge(parent::fields(), [
+            'image' => 'image'
+        ]);
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -77,5 +90,24 @@ class Claim extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    public function beforeValidate()
+    {
+        $this->image = UploadedFile::getInstance($this, 'image');
+        return parent::beforeValidate();
+    }
+
+    public function beforeSave($insert)
+    {
+
+        $filename = uniqid() . '.' . $this->image->extension;
+        $this->image->saveAs('img/' . $filename);
+        $this->photo_before = $filename;
+
+        $this->user_id = Yii::$app->user->identity->id;
+        $this->status = 'Новая';
+
+        return parent::beforeSave($insert);
     }
 }

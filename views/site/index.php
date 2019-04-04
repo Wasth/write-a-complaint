@@ -5,8 +5,6 @@
 $this->title = 'Помоги городу!';
 ?>
 
-
-
 <div class="jumbotron">
     <div class="container">
         <h1>Привет, дорогой друг!</h1>
@@ -24,57 +22,23 @@ $this->title = 'Помоги городу!';
     </div>
 </div>
 
-<div class="container">
+<div class="site-index container">
     <h2>Последние решенные проблемы</h2>
     <br>
     <div class="row">
-        <div class="col-sm-6 col-md-3">
-            <div class="thumbnail">
-                <img src="/img/problem1.png" alt="Яма на дороге">
-                <img src="/img/problem2.png" alt="Яма на дороге">
+        <?php foreach($claims as $claim): ?>
+            <div class="col-sm-6 col-md-4">
+                <div class="col-md-12 card">
+                    <h3><?= $claim->name ?></h3>
+                    <h4><?= $claim->description ?></h4>
+                    <div class="photo">
+                        <div class="photoBefore"><img src="/img/<?= $claim->photo_before ?>" alt="<?= $claim->name ?> before"></div>
+                        <?php if($claim->photo_after): ?>
+                            <div class="photoAfter"><img src="/img/<?= $claim->photo_after ?>" alt="<?= $claim->name ?> after"></div>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="thumbnail">
-                <img src="img/solve2.png" alt="Яма на дороге">
-                <img src="img/problem2.png" alt="Яма на дороге">
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="thumbnail">
-                <img src="img/solve2.png" alt="Яма на дороге">
-                <img src="img/problem2.png" alt="Яма на дороге">
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="thumbnail">
-                <img src="img/solve2.png" alt="Яма на дороге">
-                <img src="img/problem2.png" alt="Яма на дороге">
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="thumbnail">
-                <img src="img/solve2.png" alt="Яма на дороге">
-                <img src="img/problem2.png" alt="Яма на дороге">
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="thumbnail">
-                <img src="img/solve2.png" alt="Яма на дороге">
-                <img src="img/problem2.png" alt="Яма на дороге">
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="thumbnail">
-                <img src="img/solve2.png" alt="Яма на дороге">
-                <img src="img/problem2.png" alt="Яма на дороге">
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="thumbnail">
-                <img src="img/solve2.png" alt="Яма на дороге">
-                <img src="img/problem2.png" alt="Яма на дороге">
-            </div>
-        </div>
+        <?php endforeach; ?>
     </div>
 </div>
