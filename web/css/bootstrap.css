@@ -8,6 +8,7 @@ html {
   font-family: sans-serif;
   -webkit-text-size-adjust: 100%;
       -ms-text-size-adjust: 100%;
+  user-select: none;
 }
 body {
   margin: 0;
@@ -6756,7 +6757,8 @@ button.close {
 }
 /*# sourceMappingURL=bootstrap.css.map */
 .site-claim img,
-.site-index img
+.site-index img,
+.site-myclaims img
 {
   max-width: 100%;
 }
@@ -6770,6 +6772,52 @@ button.close {
   overflow: hidden;
 }
 .card h3,
-.card h4 {
+.card h4,
+.card h1,
+.claim-category
+{
   padding: 0 20px;
+}
+.site-index .row:before,
+.site-myclaims .row:before
+{
+  content: none;
+}
+.site-index .row,
+.site-myclaims .row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 20px;
+}
+.remove-claim {
+  float: right;
+}
+.claim-category {
+  color: gray;
+}
+.admin-img {
+  max-width: 300px;
+}
+.photo {
+  position: relative;
+}
+.photo .photoAfter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  object-fit: cover;
+  border-right: 2px solid white;
+  background-size: cover;
+}
+.photo .photoAfter .circle{
+  position: absolute;
+  top: calc(50% - 10px);
+  right: -10px;
+  height: 20px;
+  width: 20px;
+  background-color: #fff;
+  border-radius: 50%;
+  cursor: pointer;
 }

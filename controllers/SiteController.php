@@ -8,6 +8,8 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\Url;
 use yii\web\Controller;
+use yii\web\ErrorAction;
+use yii\web\NotFoundHttpException;
 
 class SiteController extends Controller
 {
@@ -22,16 +24,36 @@ class SiteController extends Controller
                     [
                         'allow' => true,
                         'actions' => ['signin', 'signup'],
-                        'roles' => ['?']
+                        'roles' => ['?'],
+                        'denyCallback' => function ($rule, $action) {
+                            return $action->controller->redirect(['/']);
+                        },
                     ],
                     [
                         'allow' => true,
                         'actions' => ['logout', 'newclaim', 'myclaims'],
-                        'roles' => ['@']
+                        'roles' => ['@'],
+                        'denyCallback' => function ($rule, $action) {
+                            return $action->controller->redirect(['/']);
+                        },
                     ],
-                ]
+                ],
+                'denyCallback' => function ($rule, $action) {
+                    throw new NotFoundHttpException();
+                },
             ]
         ];
+    }
+
+    public function actions()
+    {
+        $actions = parent::actions();
+
+        $actions['error'] = [
+            'class' => ErrorAction::className()
+        ];
+
+        return $actions;
     }
 
     public function actionSignin()
@@ -73,7 +95,7 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
-        $claims = Claim::find()->limit(8)->all();
+        $claims = Claim::find()->orderBy('id DESC')->limit(8)->all();
         return $this->render('index', [
             'claims' => $claims
         ]);
@@ -81,7 +103,7 @@ class SiteController extends Controller
 
     public function actionNewclaim()
     {
-        $model = new \app\models\Claim();
+        $model = new Claim();
 
         if ($model->load(Yii::$app->request->post())) {
             if ($model->validate() && $model->save(false)) {
@@ -94,10 +116,41 @@ class SiteController extends Controller
         ]);
     }
 
-    public function actionClaim($id){
-        $claim = Claim::findOne($id);
-        return $this->render('claim',
-            ['claim' => $claim]
+    public function actionClaim($id)
+    {
+        if($claim = Claim::findOne($id)){
+            return $this->render('claim',
+                ['claim' => $claim]
+            );
+        }
+        throw new NotFoundHttpException();
+    }
+
+    public function actionMyclaims()
+    {
+        $claims = Claim::find()->where(['user_id' => Yii::$app->user->id])->all();
+
+        return $this->render('myclaims',
+            [
+                'claims' => $claims,
+            ]
         );
+    }
+
+    public function actionRemove($id){
+        if($claim = Claim::findOne($id)) {
+            if($claim->user_id == Yii::$app->user->id) {
+                $claim->delete();
+                return $this->redirect(['site/myclaims']);
+            }
+        }
+
+        throw new NotFoundHttpException();
+
+    }
+
+    public function actionTest(){
+        Yii::$app->response->sendFile('test/test.txt');
+//        return $this->render('index');
     }
 }
